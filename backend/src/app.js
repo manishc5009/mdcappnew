@@ -31,7 +31,7 @@ app.use((req, res, next) => {
 });
 
 // Serve frontend static files
-app.use(express.static(path.join(__dirname, 'frontend/dist')));
+app.use(express.static(path.join(__dirname, 'src/frontend/dist')));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -45,7 +45,7 @@ app.use((req, res, next) => {
   const isApi = req.url.startsWith('/api/');
   const isAsset = req.url.includes('.');
   if (!isApi && !isAsset) {
-    res.sendFile(path.join(__dirname, 'frontend/dist/index.html'));
+    res.sendFile(path.join(__dirname, 'src/frontend/dist/index.html'));
   } else {
     next();
   }
