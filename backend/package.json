@@ -1,6 +1,6 @@
 {
   "name": "node-backend-project",
-  "type": "commonjs",
+  "type": "module",
   "version": "1.0.0",
   "description": "A Node.js backend project implementing user authentication and organization management.",
   "main": "src/app.js",
