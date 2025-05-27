@@ -24,6 +24,12 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Request logging middleware for diagnostics
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  next();
+});
+
 // Serve frontend static files
 app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
