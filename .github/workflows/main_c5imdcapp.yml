@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy Node.js app to Azure Web App - c5imdcapp
 
 on:
@@ -9,6 +12,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read #This is required for actions/checkout
 
     steps:
       - uses: actions/checkout@v4
@@ -18,52 +23,42 @@ jobs:
         with:
           node-version: '22.x'
 
-      # 🔧 Install and build frontend
-      - name: Install and build frontend
-        working-directory: frontend
+      - name: npm install, build, and test
         run: |
           npm install
-          npm run build
-
-      # 🔧 Install backend
-      - name: Install backend dependencies
-        working-directory: backend
-        run: |
-          npm install
-
-      # 🗜️ Zip entire backend (including frontend/build inside it)
-      - name: Copy frontend dist to backend folder
-        run: cp -r frontend/dist backend/
+          npm run build --if-present
+          npm run test --if-present
 
       - name: Zip artifact for deployment
-        working-directory: ./backend
-        run: |
-          zip -r release.zip .
+        run: zip release.zip ./* -r
 
-      - name: Upload artifact
+      - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: backend/release.zip
+          path: release.zip
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
-
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    
     steps:
-      - name: Download artifact
+      - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: node-app
 
-      - name: Unzip artifact
+      - name: Unzip artifact for deployment
         run: unzip release.zip
-
-      - name: Deploy to Azure Web App
+      
+      - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'c5imdcapp'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B6EB3D67D2A24BE4A9505099F689F62E }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_A090FF9091E14C14A5A71DE75C6A741E }}
